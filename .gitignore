@@ -1,0 +1,166 @@
+# JejakJajan - Real-time Street Vendor Tracking
+
+> Aplikasi full-stack modern untuk tracking pedagang kaki lima keliling secara real-time menggunakan peta
+
+## 🎯 Fitur Utama
+
+### 👨‍💼 Admin Dashboard
+- Statistik lengkap (users, vendors, orders, revenue)
+- Heatmap lokasi ramai
+- Verifikasi dan suspend vendor
+- User management
+- Analytics dan reporting
+
+### 👨‍🍳 Vendor Features
+- GPS tracking real-time (update setiap 5 detik)
+- Manage menu dan harga
+- Status management (ACTIVE/RESTING/INACTIVE)
+- Pre-order management
+- Dashboard penjualan
+- Follower tracking
+
+### 🛒 Buyer Features  
+- Live map dengan marker vendor aktif
+- Filter berdasarkan kategori
+- Follow vendor favorit
+- Notifikasi radius 500m
+- Pre-order makanan
+- Rating dan review
+- Order tracking
+
+## 🏗️ Tech Stack
+
+- **Frontend**: React 18, Vite, TailwindCSS, Leaflet
+- **Backend**: Node.js, Express, Prisma
+- **Database**: PostgreSQL
+- **Real-time**: Socket.io
+- **Deployment**: Docker, Docker Compose
+
+## 🚀 Quick Start
+
+### Docker Compose
+```bash
+docker compose up -d
+# Frontend: http://localhost
+# Backend: http://localhost:5000
+```
+
+### Development
+```bash
+# Backend
+cd backend && npm install && npm run dev
+
+# Frontend
+cd frontend && npm install && npm run dev
+```
+
+## 📖 Documentation
+
+- [Setup Guide](./docs/SETUP_GUIDE.md) - Detailed setup instructions
+- [API Documentation](./docs/API_DOCUMENTATION.md) - Complete API reference
+- [Architecture](./docs/ARCHITECTURE.md) - System architecture
+- [Algorithms](./docs/ALGORITHMS.md) - Algorithms & geolocation
+
+## 🔐 Credentials (Demo)
+
+**Admin User**
+```
+Email: admin@example.com
+Password: admin123
+Role: ADMIN
+```
+
+**Vendor User**
+```
+Email: vendor@example.com  
+Password: vendor123
+Role: VENDOR
+```
+
+**Buyer User**
+```
+Email: buyer@example.com
+Password: buyer123
+Role: BUYER
+```
+
+> ⚠️ Change credentials in production!
+
+## 📁 Project Structure
+
+```
+JejakJajan/
+├── backend/           # Node.js + Express API
+├── frontend/          # React + Vite app
+├── docker-compose.yml # Container orchestration
+├── docs/             # Documentation
+└── README.md         # This file
+```
+
+## 🔧 Key Algorithms
+
+1. **Haversine Formula** - Distance calculation
+2. **Vendor Clustering** - Group vendors by proximity
+3. **Linear Regression** - Predict peak hours
+4. **Heatmap Generation** - Visualize activity
+5. **Radius Search** - Find nearby vendors
+
+## 📊 Database Schema
+
+- Users (with roles)
+- Vendors (with location, status)
+- Menus (with prices)
+- Orders (with items)
+- Reviews (with ratings)
+- LocationHistory (GPS tracking)
+- UserFollowers (social)
+
+## 🔌 WebSocket Events
+
+Real-time communication for:
+- Vendor location updates
+- Order status changes
+- Nearby vendor notifications
+- Follower updates
+
+## 🎨 UI/UX
+
+- Modern minimal design
+- Mobile-first responsive
+- Dark/light mode ready
+- Smooth animations
+- Toast notifications
+- Loading skeletons
+
+## 🚢 Deployment
+
+### Docker Compose (Recommended)
+```bash
+docker compose build
+docker compose up -d
+```
+
+### Production Checklist
+- [ ] Change JWT_SECRET
+- [ ] Set production DATABASE_URL
+- [ ] Enable HTTPS
+- [ ] Configure CORS properly
+- [ ] Setup monitoring
+- [ ] Database backups
+
+## 📝 License
+
+MIT License - Feel free to use for your projects
+
+## 👥 Support
+
+For issues and questions:
+1. Check documentation in `/docs`
+2. Review API docs
+3. Check troubleshooting in SETUP_GUIDE.md
+
+---
+
+**Version**: 1.0.0  
+**Created**: February 2026  
+**Status**: Production Ready ✅

@@ -1,0 +1,225 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  VENDOR
+  ADMIN
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  RESTING
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// User Model
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      UserRole @default(BUYER)
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  vendor             Vendor?
+  orders             Order[] @relation("BuyerOrders")
+  reviews            Review[]
+  followers          UserFollower[] @relation("Follower")
+  following          UserFollower[] @relation("Following")
+  notificationTokens NotificationToken[]
+
+  @@map("users")
+}
+
+// Vendor Model
+model Vendor {
+  id                String       @id @default(cuid())
+  userId            String       @unique
+  storeName         String
+  description       String?
+  category          String // e.g., "Makanan", "Minuman", "Dessert"
+  latitude          Float        @default(0)
+  longitude         Float        @default(0)
+  status            VendorStatus @default(INACTIVE)
+  rating            Float        @default(0)
+  totalReviews      Int          @default(0)
+  profileImage      String?
+  isVerified        Boolean      @default(false)
+  isSuspended       Boolean      @default(false)
+  suspendReason     String?
+  followerCount     Int          @default(0)
+  totalSales        Int          @default(0)
+  lastLocationTime  DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  // Relations
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  menus             Menu[]
+  orders            Order[] @relation("VendorOrders")
+  reviews           Review[]
+  locationHistory   LocationHistory[]
+  vendorStats       VendorStats?
+
+  @@map("vendors")
+}
+
+// Menu Model
+model Menu {
+  id        String   @id @default(cuid())
+  vendorId  String
+  name      String
+  description String?
+  price     Float
+  image     String?
+  isAvailable Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@map("menus")
+}
+
+// Order Model
+model Order {
+  id           String      @id @default(cuid())
+  buyerId      String
+  vendorId     String
+  totalPrice   Float
+  status       OrderStatus @default(PENDING)
+  notes        String?
+  deliveryLat  Float?
+  deliveryLon  Float?
+  estimatedETA Int? // in minutes
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  buyer        User         @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  vendor       Vendor       @relation("VendorOrders", fields: [vendorId], references: [id], onDelete: Cascade)
+  items        OrderItem[]
+  review       Review?
+
+  @@map("orders")
+}
+
+// Order Item Model
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  menuId    String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+
+  // Relations
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+// Review Model
+model Review {
+  id        String   @id @default(cuid())
+  buyerId   String
+  vendorId  String
+  orderId   String   @unique
+  rating    Int // 1-5 stars
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  buyer     User     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+// User Follower Model
+model UserFollower {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("user_followers")
+}
+
+// Location History Model
+model LocationHistory {
+  id        String   @id @default(cuid())
+  vendorId  String
+  latitude  Float
+  longitude Float
+  accuracy  Float?
+  createdAt DateTime @default(now())
+
+  // Relations
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([vendorId, createdAt])
+  @@map("location_history")
+}
+
+// Vendor Statistics Model
+model VendorStats {
+  id                    String   @id @default(cuid())
+  vendorId              String   @unique
+  totalOrdersThisMonth  Int      @default(0)
+  totalRevenueThisMonth Float    @default(0)
+  averageDailyRevenue   Float    @default(0)
+  peakHours            String? // JSON string of peak hours
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  vendor                Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_stats")
+}
+
+// Notification Token Model
+model NotificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_tokens")
+}

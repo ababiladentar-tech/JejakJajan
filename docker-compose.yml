@@ -1,0 +1,67 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: jejak_jajan_postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: jejak_jajan_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d jejak_jajan_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jejak_network
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jejak_jajan_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://user:password@postgres:5432/jejak_jajan_db
+      JWT_SECRET: your_super_secret_jwt_key_change_in_production
+      JWT_EXPIRE: 7d
+      CORS_ORIGIN: http://localhost,http://localhost:3000,http://localhost:80
+      SOCKET_CORS: http://localhost,http://localhost:3000,http://localhost:80
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - jejak_network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jejak_jajan_frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "3000:80"
+    networks:
+      - jejak_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  jejak_network:
+    driver: bridge
