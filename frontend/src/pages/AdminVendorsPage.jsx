@@ -28,7 +28,7 @@ export default function AdminVendorsPage() {
       setVendors(vendorsList);
     } catch (err) {
       console.error(err);
-      toast.error('Gagal load vendor');
+      toast.error('Gagal memuat paklek');
     } finally {
       setLoading(false);
     }
@@ -61,10 +61,10 @@ export default function AdminVendorsPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Manage Vendors</h1>
+      <h1 className="text-2xl font-bold mb-6">Kelola Paklek</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Vendor List */}
+        {/* Daftar Paklek */}
         <div className="lg:col-span-2">
           <div className="space-y-2">
             {vendors.map((vendor) => (
@@ -85,7 +85,7 @@ export default function AdminVendorsPage() {
           </div>
         </div>
 
-        {/* Vendor Detail */}
+        {/* Detail Paklek */}
         <div className="bg-white p-4 rounded shadow">
           {selectedVendor ? (
             <>
@@ -122,6 +122,36 @@ export default function AdminVendorsPage() {
                     <div>
                       <span className="font-semibold">Followers:</span> {selectedVendor.vendor.followerCount}
                     </div>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await adminService.suspendVendor(selectedVendor.vendor.id, 'Disabled by admin');
+                            toast.success('Paklek dinonaktifkan');
+                            loadVendors();
+                          } catch (err) {
+                            toast.error('Gagal menonaktifkan');
+                          }
+                        }}
+                        className="flex-1 bg-yellow-500 text-white py-2 rounded text-sm"
+                      >
+                        Nonaktifkan
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await adminService.unsuspendVendor(selectedVendor.vendor.id);
+                            toast.success('Paklek diaktifkan');
+                            loadVendors();
+                          } catch (err) {
+                            toast.error('Gagal mengaktifkan');
+                          }
+                        }}
+                        className="flex-1 bg-green-600 text-white py-2 rounded text-sm"
+                      >
+                        Aktifkan
+                      </button>
+                    </div>
                   </>
                 )}
               </div>
@@ -136,7 +166,7 @@ export default function AdminVendorsPage() {
               </button>
             </>
           ) : (
-            <div className="text-gray-600 text-center">Pilih vendor untuk detail</div>
+            <div className="text-gray-600 text-center">Pilih paklek untuk detail</div>
           )}
         </div>
       </div>

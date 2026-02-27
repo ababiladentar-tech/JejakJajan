@@ -24,6 +24,7 @@ body {
 .leaflet-container {
   height: 100%;
   width: 100%;
+  z-index: 0; /* keep map layers below sticky headers */
 }
 
 .leaflet-marker-pane img {
@@ -47,4 +48,30 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Compact buttons on small screens */
+@media (max-width: 540px) {
+  html {
+    font-size: 15px;
+  }
+  body {
+    padding: 0;
+  }
+  button {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.95rem;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.85rem;
+  }
+  h1 {
+    font-size: 1.7rem;
+  }
+  h2 {
+    font-size: 1.35rem;
+  }
 }

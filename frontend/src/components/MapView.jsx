@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import VendorMarker from './VendorMarker';
 
@@ -11,7 +11,14 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export default function MapView({ vendors = [], userLocation, onVendorSelect, height = 'h-96' }) {
+export default function MapView({
+  vendors = [],
+  userLocation,
+  onVendorSelect,
+  height = 'h-96',
+  radarRadius = 500,
+  outerRadius = null,
+}) {
   const [mapCenter, setMapCenter] = useState([-6.2088, 106.8456]); // Jakarta
   const [mapZoom, setMapZoom] = useState(13);
 
@@ -21,6 +28,16 @@ export default function MapView({ vendors = [], userLocation, onVendorSelect, he
       setMapZoom(14);
     }
   }, [userLocation]);
+
+  const RecenterMap = ({ position }) => {
+    const map = useMap();
+    useEffect(() => {
+      if (position) {
+        map.setView(position, map.getZoom(), { animate: true });
+      }
+    }, [map, position]);
+    return null;
+  };
 
   const createCustomIcon = (status, distanceKM) => {
     const colors = {
@@ -54,7 +71,7 @@ export default function MapView({ vendors = [], userLocation, onVendorSelect, he
   };
 
   return (
-    <div className={`rounded-lg overflow-hidden shadow-lg ${height}`}>
+    <div className={`rounded-lg overflow-hidden shadow-lg relative z-0 ${height}`}>
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
@@ -67,22 +84,48 @@ export default function MapView({ vendors = [], userLocation, onVendorSelect, he
 
         {/* User location marker */}
         {userLocation && (
-          <Marker
-            position={[
-              userLocation.latitude || userLocation.lat,
-              userLocation.longitude || userLocation.lon,
-            ]}
-            icon={L.icon({
-              iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-              shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -34],
-              shadowSize: [41, 41],
-            })}
-          >
-            <Popup>Your location</Popup>
-          </Marker>
+          <>
+            <RecenterMap
+              position={[
+                userLocation.latitude || userLocation.lat,
+                userLocation.longitude || userLocation.lon,
+              ]}
+            />
+            {outerRadius && (
+              <Circle
+                center={[
+                  userLocation.latitude || userLocation.lat,
+                  userLocation.longitude || userLocation.lon,
+                ]}
+                radius={outerRadius}
+                pathOptions={{ color: '#004E89', fillColor: '#004E89', fillOpacity: 0.04, dashArray: '6 6' }}
+              />
+            )}
+            <Circle
+              center={[
+                userLocation.latitude || userLocation.lat,
+                userLocation.longitude || userLocation.lon,
+              ]}
+              radius={radarRadius}
+              pathOptions={{ color: '#06A77D', fillColor: '#06A77D', fillOpacity: 0.1 }}
+            />
+            <Marker
+              position={[
+                userLocation.latitude || userLocation.lat,
+                userLocation.longitude || userLocation.lon,
+              ]}
+              icon={L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41],
+              })}
+            >
+              <Popup>Lokasi kamu</Popup>
+            </Marker>
+          </>
         )}
 
         {/* Vendor markers */}

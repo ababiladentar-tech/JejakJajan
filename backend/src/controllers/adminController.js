@@ -285,3 +285,31 @@ export const unsuspendUser = async (req, res) => {
     res.status(500).json({ message: 'Error unsuspending user' });
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Hanya hapus buyer agar tidak menghapus vendor/admin secara tidak sengaja
+    if (user.role !== 'BUYER') {
+      return res.status(400).json({ message: 'Hanya buyer yang boleh dihapus langsung' });
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.json({ message: 'User deleted' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error deleting user' });
+  }
+};

@@ -112,7 +112,16 @@ export const useMapStore = create((set) => ({
   mapCenter: [-6.2088, 106.8456], // Jakarta default
   zoom: 13,
   
-  setUserLocation: (lat, lon) => set({ userLocation: { lat, lon } }),
+  setUserLocation: (lat, lon) =>
+    set({
+      userLocation: {
+        lat,
+        lon,
+        latitude: lat,
+        longitude: lon,
+      },
+      mapCenter: [lat, lon],
+    }),
   setMapCenter: (lat, lon) => set({ mapCenter: [lat, lon] }),
   setZoom: (zoom) => set({ zoom }),
 }));

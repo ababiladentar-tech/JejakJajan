@@ -13,6 +13,7 @@ router.get('/heatmap', authenticate, authorize(['ADMIN']), adminController.getHe
 router.get('/users', authenticate, authorize(['ADMIN']), adminController.getAllUsers);
 router.put('/users/:userId/suspend', authenticate, authorize(['ADMIN']), adminController.suspendUser);
 router.put('/users/:userId/unsuspend', authenticate, authorize(['ADMIN']), adminController.unsuspendUser);
+router.delete('/users/:userId', authenticate, authorize(['ADMIN']), adminController.deleteUser);
 
 // Vendor Management
 router.put('/vendors/:vendorId/verify', authenticate, authorize(['ADMIN']), adminController.verifyVendor);

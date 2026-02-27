@@ -88,3 +88,15 @@ export const getStatusBadgeColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
+// Build absolute URL for static assets served by backend (e.g., /uploads/...)
+const backendBase =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BACKEND_URL) ||
+  'http://localhost:5000';
+
+export const getAssetUrl = (path) => {
+  if (!path) return '';
+  // If already absolute (http/https), return as is
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${backendBase}${path.startsWith('/') ? path : `/${path}`}`;
+};

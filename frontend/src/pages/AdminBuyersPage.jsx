@@ -82,6 +82,53 @@ export default function AdminBuyersPage() {
                   {new Date(selectedBuyer.createdAt).toLocaleDateString('id-ID')}
                 </div>
               </div>
+
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={async () => {
+                    try {
+                      await adminService.suspendUser(selectedBuyer.id, 'Disabled by admin');
+                      toast.success('Akun dinonaktifkan');
+                      loadBuyers();
+                    } catch (err) {
+                      toast.error('Gagal menonaktifkan');
+                    }
+                  }}
+                  className="flex-1 bg-yellow-500 text-white py-2 rounded text-sm"
+                >
+                  Nonaktifkan
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await adminService.unsuspendUser(selectedBuyer.id);
+                      toast.success('Akun diaktifkan');
+                      loadBuyers();
+                    } catch (err) {
+                      toast.error('Gagal mengaktifkan');
+                    }
+                  }}
+                  className="flex-1 bg-green-600 text-white py-2 rounded text-sm"
+                >
+                  Aktifkan
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!window.confirm('Hapus akun buyer ini?')) return;
+                    try {
+                      await adminService.deleteUser(selectedBuyer.id);
+                      toast.success('Akun dihapus');
+                      setSelectedBuyer(null);
+                      loadBuyers();
+                    } catch (err) {
+                      toast.error('Gagal menghapus');
+                    }
+                  }}
+                  className="flex-1 bg-red-600 text-white py-2 rounded text-sm"
+                >
+                  Hapus
+                </button>
+              </div>
             </>
           ) : (
             <div className="text-gray-600 text-center">Pilih pembeli untuk detail</div>

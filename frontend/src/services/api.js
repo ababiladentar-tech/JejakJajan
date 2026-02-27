@@ -47,8 +47,28 @@ export const vendorService = {
 
 // Menu Services
 export const menuService = {
-  create: (data) => api.post('/menus', data),
-  update: (menuId, data) => api.put(`/menus/${menuId}`, data),
+  create: (data) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('description', data.description || '');
+    formData.append('price', data.price);
+    if (data.isAvailable !== undefined) formData.append('isAvailable', data.isAvailable);
+    if (data.imageFile) formData.append('image', data.imageFile);
+    return api.post('/menus', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  update: (menuId, data) => {
+    const formData = new FormData();
+    if (data.name) formData.append('name', data.name);
+    if (data.description !== undefined) formData.append('description', data.description);
+    if (data.price !== undefined) formData.append('price', data.price);
+    if (data.isAvailable !== undefined) formData.append('isAvailable', data.isAvailable);
+    if (data.imageFile) formData.append('image', data.imageFile);
+    return api.put(`/menus/${menuId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
   delete: (menuId) => api.delete(`/menus/${menuId}`),
   getVendorMenus: (vendorId) => api.get(`/menus/vendor/${vendorId}`),
 };
@@ -85,6 +105,7 @@ export const adminService = {
   suspendUser: (userId, reason) =>
     api.put(`/admin/users/${userId}/suspend`, { reason }),
   unsuspendUser: (userId) => api.put(`/admin/users/${userId}/unsuspend`),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
 };
 
 export default api;

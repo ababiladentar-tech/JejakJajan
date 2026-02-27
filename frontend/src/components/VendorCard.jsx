@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore, useVendorStore } from '../context/store';
-import { formatCurrency } from '../utils/helpers';
+import { formatCurrency, getAssetUrl } from '../utils/helpers';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 export default function VendorCard({ vendor, showDistance = false }) {
@@ -12,7 +12,9 @@ export default function VendorCard({ vendor, showDistance = false }) {
   const isFav = favorites.includes(vendor.id || vendor.vendorId);
 
   const handleViewDetail = () => {
-    navigate(`/vendor/${vendor.id}`);
+    const id = vendor.id || vendor.vendorId;
+    if (!id) return;
+    navigate(`/vendor/${id}`);
   };
 
   return (
@@ -21,7 +23,7 @@ export default function VendorCard({ vendor, showDistance = false }) {
       <div className="relative h-40 bg-gray-200 overflow-hidden">
         {vendor.profileImage ? (
           <img
-            src={vendor.profileImage}
+            src={getAssetUrl(vendor.profileImage)}
             alt={vendor.storeName}
             className="w-full h-full object-cover"
           />

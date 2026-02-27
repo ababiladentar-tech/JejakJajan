@@ -6,6 +6,7 @@ import { authService } from './services/api';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import BuyerMapPage from './pages/BuyerMapPage';
+import VendorDetailPage from './pages/VendorDetailPage';
 import VendorDashboard from './pages/VendorDashboard';
 import VendorMenuPage from './pages/VendorMenuPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -48,6 +49,10 @@ export default function App() {
         <Route
           path="/buyer/map"
           element={isAuthenticated && user?.role === 'BUYER' ? <BuyerMapPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/vendor/:vendorId"
+          element={isAuthenticated ? <VendorDetailPage /> : <Navigate to="/login" />}
         />
 
         {/* Vendor Routes */}

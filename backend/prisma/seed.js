@@ -51,6 +51,48 @@ async function seed() {
 
     console.log('✅ Vendors created:', vendor1.email, vendor2.email);
 
+    // Create Surabaya vendor users
+    const vendor3 = await prisma.user.upsert({
+      where: { email: 'surabaya.rawon@example.com' },
+      update: {},
+      create: {
+        name: 'Pak Lek Rawon',
+        email: 'surabaya.rawon@example.com',
+        password: await hashPassword('vendor123'),
+        phone: '081234111222',
+        role: 'VENDOR',
+        isActive: true,
+      },
+    });
+
+    const vendor4 = await prisma.user.upsert({
+      where: { email: 'surabaya.degan@example.com' },
+      update: {},
+      create: {
+        name: 'Bu Dega',
+        email: 'surabaya.degan@example.com',
+        password: await hashPassword('vendor123'),
+        phone: '081234333444',
+        role: 'VENDOR',
+        isActive: true,
+      },
+    });
+
+    const vendor5 = await prisma.user.upsert({
+      where: { email: 'surabaya.cakwe@example.com' },
+      update: {},
+      create: {
+        name: 'Mas Cakwe',
+        email: 'surabaya.cakwe@example.com',
+        password: await hashPassword('vendor123'),
+        phone: '081234555666',
+        role: 'VENDOR',
+        isActive: true,
+      },
+    });
+
+    console.log('✅ Surabaya vendors created:', vendor3.email, vendor4.email, vendor5.email);
+
     // Create vendor profiles
     const shop1 = await prisma.vendor.upsert({
       where: { userId: vendor1.id },
@@ -92,6 +134,66 @@ async function seed() {
 
     console.log('✅ Vendor profiles created:', shop1.storeName, shop2.storeName);
 
+    // Create Surabaya vendor profiles (centered around Surabaya)
+    const shop3 = await prisma.vendor.upsert({
+      where: { userId: vendor3.id },
+      update: {},
+      create: {
+        userId: vendor3.id,
+        storeName: 'Rawon Pak Lek',
+        description: 'Rawon daging khas Surabaya, kuah pekat kluwek',
+        category: 'Makanan',
+        latitude: -7.2575,   // Tunjungan Plaza area
+        longitude: 112.7521,
+        status: 'ACTIVE',
+        rating: 4.7,
+        totalReviews: 28,
+        isVerified: true,
+        followerCount: 95,
+        totalSales: 140,
+      },
+    });
+
+    const shop4 = await prisma.vendor.upsert({
+      where: { userId: vendor4.id },
+      update: {},
+      create: {
+        userId: vendor4.id,
+        storeName: 'Es Degan Pakde',
+        description: 'Es kelapa muda seger keliling Embong Malang',
+        category: 'Minuman',
+        latitude: -7.2625,   // Embong Malang
+        longitude: 112.7360,
+        status: 'ACTIVE',
+        rating: 4.5,
+        totalReviews: 18,
+        isVerified: false,
+        followerCount: 60,
+        totalSales: 90,
+      },
+    });
+
+    const shop5 = await prisma.vendor.upsert({
+      where: { userId: vendor5.id },
+      update: {},
+      create: {
+        userId: vendor5.id,
+        storeName: 'Cakwe Embong',
+        description: 'Cakwe hangat dengan saus bawang khas Pasar Genteng',
+        category: 'Snack',
+        latitude: -7.2638,   // Pasar Genteng area
+        longitude: 112.7409,
+        status: 'ACTIVE',
+        rating: 4.4,
+        totalReviews: 15,
+        isVerified: false,
+        followerCount: 45,
+        totalSales: 70,
+      },
+    });
+
+    console.log('✅ Surabaya vendor profiles created:', shop3.storeName, shop4.storeName, shop5.storeName);
+
     // Create menus
     const menus = await Promise.all([
       prisma.menu.create({
@@ -118,6 +220,60 @@ async function seed() {
           name: 'Tahu Goreng (5 pcs)',
           description: 'Tahu goreng golden dengan sambal kacang',
           price: 15000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop3.id,
+          name: 'Rawon Daging',
+          description: 'Porsi besar, daging empuk, sambal terasi',
+          price: 25000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop3.id,
+          name: 'Rawon Tetelan',
+          description: 'Kuah kluwek, topping tetelan gurih',
+          price: 20000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop4.id,
+          name: 'Es Degan Murni',
+          description: 'Kelapa muda utuh, sirup gula jawa',
+          price: 12000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop4.id,
+          name: 'Es Degan Jeruk',
+          description: 'Kelapa muda + perasan jeruk nipis',
+          price: 14000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop5.id,
+          name: 'Cakwe Original',
+          description: 'Disajikan hangat dengan saus bawang',
+          price: 8000,
+          isAvailable: true,
+        },
+      }),
+      prisma.menu.create({
+        data: {
+          vendorId: shop5.id,
+          name: 'Cakwe Isi Ayam',
+          description: 'Cakwe isi ayam cincang, cocok untuk cemilan',
+          price: 12000,
           isAvailable: true,
         },
       }),

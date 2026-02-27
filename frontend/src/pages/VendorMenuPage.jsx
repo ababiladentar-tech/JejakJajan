@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../context/store';
 import { vendorService, menuService } from '../services/api';
+import { getAssetUrl } from '../utils/helpers';
 import toast from 'react-hot-toast';
 
 export default function VendorMenuPage() {
@@ -14,6 +15,8 @@ export default function VendorMenuPage() {
     description: '',
     price: 0,
     image: '',
+    imageFile: null,
+    imagePreview: '',
   });
 
   useEffect(() => {
@@ -41,20 +44,21 @@ export default function VendorMenuPage() {
       return;
     }
 
+    const payload = {
+      ...formData,
+      price: parseFloat(formData.price),
+    };
+
     try {
       if (editingMenu) {
-        await menuService.update(editingMenu.id, formData);
+        await menuService.update(editingMenu.id, payload);
         toast.success('Menu berhasil diupdate');
       } else {
-        await menuService.create({
-          vendorId: user.vendor.id,
-          ...formData,
-          price: parseFloat(formData.price),
-        });
+        await menuService.create(payload);
         toast.success('Menu berhasil ditambah');
       }
       setShowModal(false);
-      setFormData({ name: '', description: '', price: 0, image: '' });
+      setFormData({ name: '', description: '', price: 0, image: '', imageFile: null, imagePreview: '' });
       setEditingMenu(null);
       loadMenus();
     } catch (err) {
@@ -82,6 +86,8 @@ export default function VendorMenuPage() {
       description: menu.description || '',
       price: menu.price,
       image: menu.image || '',
+      imageFile: null,
+      imagePreview: menu.image || '',
     });
     setShowModal(true);
   };
@@ -108,7 +114,11 @@ export default function VendorMenuPage() {
         {menus.map((menu) => (
           <div key={menu.id} className="bg-white p-4 rounded shadow">
             {menu.image && (
-              <img src={menu.image} alt={menu.name} className="w-full h-40 object-cover rounded mb-2" />
+              <img
+                src={getAssetUrl(menu.image)}
+                alt={menu.name}
+                className="w-full h-40 object-cover rounded mb-2"
+              />
             )}
             <h3 className="font-semibold mb-1">{menu.name}</h3>
             <p className="text-sm text-gray-600 mb-2">{menu.description}</p>
@@ -177,14 +187,27 @@ export default function VendorMenuPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-1">URL Gambar (opsional)</label>
+                <label className="block text-sm font-semibold mb-1">Foto Menu</label>
                 <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                  placeholder="https://..."
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageFile: file || null,
+                      imagePreview: file ? URL.createObjectURL(file) : prev.image,
+                    }));
+                  }}
+                  className="w-full text-sm"
                 />
+                {formData.imagePreview && (
+                    <img
+                      src={formData.imagePreview}
+                      alt="Preview"
+                      className="mt-2 w-full h-32 object-cover rounded"
+                    />
+                )}
               </div>
             </div>
             <div className="flex gap-2 mt-4">

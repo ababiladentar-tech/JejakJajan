@@ -111,7 +111,7 @@ export default function RegisterPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="BUYER">Buyer (Customer)</option>
-              <option value="VENDOR">Vendor (Seller)</option>
+              <option value="VENDOR">Paklek (Seller)</option>
             </select>
           </div>
 
